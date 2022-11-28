@@ -1,2 +1,2 @@
 # IC2
-project2
+Information and Coding project 2
