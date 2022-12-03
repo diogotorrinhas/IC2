@@ -46,4 +46,6 @@ Information and Coding project 2
 ### Ex3:
 #### Comandos de compilação:
 
+> g++ BitStream.cpp GolombTest.cpp -o testGolomb
 
+>./testGolomb 
