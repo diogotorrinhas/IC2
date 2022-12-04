@@ -61,4 +61,5 @@ Information and Coding project 2
 ### Ex6:
 #### Comandos de compilação:
 > g++ BitStream.cpp test_Codecim.cpp -o test_Codecim $(pkg-config --libs --cflags opencv4)
+
 > ./test_Codecim image1.jpeg
