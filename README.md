@@ -48,4 +48,11 @@ Information and Coding project 2
 
 > g++ BitStream.cpp GolombTest.cpp -o testGolomb
 
->./testGolomb 
+>./testGolomb
+
+### Ex4/5:
+#### Comandos de compilação:
+
+> g++ BitStream.cpp test_audioCodec.cpp -o test_audioCodec -lsndfile
+
+> ./test_audioCodec sample.wav
