@@ -5,6 +5,39 @@
 
 using namespace std;
 
+//Convert binary char array to int
+int binaryToInt(char arr[], int size){
+    int res=0;
+    for(int i = 0 ;i < size; i++){
+        if(arr[i] != 0x0){
+            res = res + pow(2, i);
+        }
+    }
+    return res;
+}
+
+// Function that convert Decimal to string in Binary
+string decToBinary(int n, int numBits)
+{
+    string numberBin = "";
+    // Size of an integer is assumed to be 32 bits
+    for (int i = 0; i < numBits; i++) {
+        int k = n >> i;
+        if (k & 1)
+            //cout << "1";
+            numberBin = numberBin + "1";
+        else
+            //cout << "0";
+            numberBin = numberBin + "0";
+    }
+    return numberBin;
+}
+
+
+
+int flag = 0;
+// int ngeral = 0;
+
 Golomb::Golomb(){}
 
 Golomb::Golomb(const char *filename, char mode, int mvalue){
@@ -18,14 +51,14 @@ Golomb::Golomb(const char *filename, char mode, int mvalue){
         Gfile = BitStream(filename, 'w');
     m = mvalue;
     b =  ceil(log2(m));
+
 }
 
 
-
 int Golomb::encode(int n){
-    printf("Value to be encoded before Folding: %d \n", n);
+    //printf("Value to be encoded before Folding: %d \n", n);
     n = fold(n);
-    printf("Value to be encoded after Folding: %d \n", n);
+    //printf("Value to be encoded after Folding: %d \n", n);
     
     
     int q = floor((int)(n / m));
@@ -83,7 +116,6 @@ int Golomb::encode(int n){
         Gfile.writeBit(aux[i]);
     return size;
 }
-
 
 int Golomb::decode(){
     int A = 0;
@@ -147,8 +179,81 @@ int Golomb::decode(){
     return 0;
 }
 
+void Golomb::encodeM(int m){
+    string aux = decToBinary(m,32);
+    char res[32];
+    for(int i = 0; i < 32; i++){
+        res[i] = aux[i];
+    }
+    Gfile.writeNbits(res,32);
+}
+
+int Golomb::decodeM(){
+    char res[32];
+    Gfile.readNbits(res, 32);
+    return binaryToInt(res, 32);
+}
+
+void Golomb::setM(int mi){
+    this->m = mi;
+    b =  ceil(log2(m));
+}
+
+
+void Golomb::encodeHeaderSound(int nFrames, int sampleRate, int Channels, int format, bool lossy){
+    string header;
+    if(lossy)
+        header = '1';
+    else
+        header = '0';
+    header += decToBinary(nFrames, 32);
+    header += decToBinary(sampleRate, 32);
+    header += decToBinary(format,32);
+    header += decToBinary(Channels, 4);
+
+    char res[101];
+    for(int i=0; i < 101; i++)
+        res[i] = header[i];
+    Gfile.writeNbits(res, 101);
+}
+
+void Golomb::encondeShamt(int shamt){
+    //Shamt -> 5 bits;
+    string sh = decToBinary(shamt, 5);
+    char res[5];
+    for(int i=0; i < 5; i++)
+        res[i] = sh[i];
+    Gfile.writeNbits(res, 5);
+}
+
+int Golomb::decodeShamt(){
+    char res[5];
+    Gfile.readNbits(res, 5);
+    return binaryToInt(res,5);
+}
+
+void Golomb::decodeHeaderSound(int arr[]){
+    //Arr[0] -> codecOption (lossy or lossless)
+    char option = Gfile.readBit();
+    arr[0] = int(option&0x1);    
+    char rd[32];
+    //Arr[1] -> num of samples
+    Gfile.readNbits(rd, 32);
+    arr[1] = binaryToInt(rd,32);
+    //Arr[2] -> Sample Rate
+    Gfile.readNbits(rd, 32);
+    arr[2] = binaryToInt(rd,32);
+    //Arr[3] -> num of samples
+    Gfile.readNbits(rd, 32);
+    arr[3] = binaryToInt(rd,32);
+    //Arr[4] -> num of channels
+    char nc[4];
+    Gfile.readNbits(nc, 4);
+    arr[4] = binaryToInt(nc,4);
+}
 
 int Golomb::fold(int n){
+    flag = 1;
     if (n >= 0)
         return n*2;
     else
@@ -158,16 +263,14 @@ int Golomb::fold(int n){
 
 
 int Golomb::unfold(int n){
+    flag = 0;
     if (n % 2 == 0)
         return n/2;
-       
     else
         return (-1)*ceil(n/2)-1;
-      
 
 }
 
-
 void Golomb::close(){
-    Gfile.close();
+   Gfile.close();
 }
