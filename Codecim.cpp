@@ -12,7 +12,6 @@ using namespace std;
 void predictor(Mat src, vector<int>& res);
 Mat preditorInverse(vector<int>& res, int nrows, int ncols);
 int Mideal(Golomb& g, vector<int>& resR, vector<int>& resG, vector<int>& resB);
-void reverse(uchar* src, uchar* dst, int size);
 int preditorJPEG1(int a);
 int preditorJLS(int a, int b, int c);
 int preditorJPEG4(int a, int b, int c);
@@ -221,11 +220,7 @@ int Mideal(Golomb& g, vector<int>& resR, vector<int>& resG, vector<int>& resB){
     return ceil(-1 / log2(media / (media + 1)));
 }
 
-void reverse(uchar* src, uchar* dst, int size){
-    for(int i = 0; i < size; i++){
-        dst[i] = src[(size - 1) - i];
-    }
-}
+
 
 int preditorJPEG1(int a){
     return a;
